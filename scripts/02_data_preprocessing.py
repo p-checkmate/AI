@@ -18,7 +18,7 @@ class BookDataset(Dataset):
         return len(self.encodings.input_ids)
 
 
-def data_preparation(file_path: str, model_name: str = "snunlp/KR-SBERT-V40K", max_length: int = 512):
+def data_preparation(file_path: str, model_name: str = "snunlp/KR-SBERT-V40K-klueNLI-augSTS", max_length: int = 512):
     """
     도서 데이터를 로드하고 전처리하여 PyTorch Dataset 객체를 반환
 
