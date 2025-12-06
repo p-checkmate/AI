@@ -14,7 +14,7 @@ API_URL = "http://www.aladin.co.kr/ttb/api/ItemList.aspx"
 QUERY_TYPES = ["BestSeller", "ItemNewAll", "ItemNewSpecial", "ItemEditorChoice"]
 
 # ItemEditorChoice에 사용할 Category ID 목록
-EDITOR_CHOICE_CATEGORY_IDS = [1, 170, 172, 336, 222, 987, 798, 1196, 74, 517]
+EDITOR_CHOICE_CATEGORY_IDS = [1, 170, 172, 336, 222, 987, 798, 1196, 74, 517, 656]
 
 # 한 페이지당 결과 수
 MAX_RESULTS = 50
