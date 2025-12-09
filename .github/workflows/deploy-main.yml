@@ -78,3 +78,16 @@ jobs:
                     sudo docker container prune -f
                     sudo docker network prune -f
                   EOF
+
+            - name: Clean up Runner Disk Space (공간 확보)
+              if: always()
+              run: |
+                  docker system prune -af
+
+                  sudo apt-get clean
+                  sudo rm -rf /var/lib/apt/lists/*
+
+                  sudo rm -rf /usr/share/dotnet
+                  sudo rm -rf /usr/local/lib/android
+                  sudo rm -rf /usr/share/swift
+                  sudo rm -rf /usr/share/rust
