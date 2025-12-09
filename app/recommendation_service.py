@@ -25,47 +25,9 @@ class AIService:
         self.tokenizer = None
         self._load_assets()
 
-    def _download_s3_folder(self, s3_prefix, local_dir):
-        """S3의 특정 Prefix에 있는 모든 파일을 로컬 디렉토리로 다운로드"""
-        # 파일 존재 여부 확인
-        test_file = os.path.join(local_dir, 'model.safetensors')
-    
-        if os.path.exists(test_file):
-            print(f"모델 파일이 로컬에 이미 존재합니다: {test_file}")
-            
-            return # 다운로드 건너뛰기
-        
-        s3 = boto3.client('s3')
-        
-        os.makedirs(local_dir, exist_ok=True)
-
-        paginator = s3.get_paginator('list_objects_v2')
-        pages = paginator.paginate(Bucket=BUCKET_NAME, Prefix=s3_prefix)
-        
-        downloaded_count = 0
-        
-        for page in pages:
-            if 'Contents' in page:
-                for obj in page['Contents']:
-                    s3_key = obj['Key']
-                    relative_path = os.path.relpath(s3_key, s3_prefix)
-                    local_file_path = os.path.join(local_dir, relative_path)
-                    
-                    # AWS S3가 파일 목록에 폴더 자체(접미사가 '/')를 포함하는 경우 건너뛰기
-                    if s3_key.endswith('/'):
-                        continue
-                        
-                    os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
-                    s3.download_file(BUCKET_NAME, s3_key, local_file_path)
-                    downloaded_count += 1
-        
-        print(f"모델 파일 다운로드 완료. ({downloaded_count}개 파일)")
-
     def _load_assets(self):
-        """API 서버 시작 시 S3 자산을 다운로드하고 메모리에 로드"""
+        """API 서버 시작 시 모델과 임베딩 파일을 메모리에 로드"""
         s3 = boto3.client('s3')
-        
-        self._download_s3_folder(S3_MODEL_PREFIX, LOCAL_MODEL_PATH)
         
         # 모델 로드
         try:
