@@ -1,0 +1,81 @@
+name: Deploy AI Server (Main)
+
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest\
+
+        steps:
+            - name: Checkout Source Code
+              uses: actions/checkout@v4
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKER_USERNAME }}
+                  password: ${{ secrets.DOCKER_PASSWORD }}
+
+            - name: Build Docker Image
+              run: |
+                  IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/checkmate-ai-server
+                  IMAGE_TAG=$(date +%Y%m%d%H%M%S)
+
+                  docker build \
+                    -t $IMAGE_NAME:$IMAGE_TAG \
+                    -t $IMAGE_NAME:latest \
+                    --build-arg BUCKET_NAME=${{ secrets.BUCKET_NAME }} \
+                    --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+                    --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+                    .
+
+            - name: Push Docker Image
+              run: |
+                  IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/checkmate-ai-server
+                  docker push $IMAGE_NAME:latest
+                  docker push $IMAGE_NAME:$(date +%Y%m%d%H%M%S)
+
+            # --- 2. EC2 접속 및 배포 ---
+            - name: Configure SSH
+              run: |
+                  mkdir -p ~/.ssh
+                  echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+                  chmod 600 ~/.ssh/id_rsa
+
+                  cat >>~/.ssh/config <<END
+                  Host checkmate
+                    HostName ${{ secrets.EC2_HOST }}
+                    User ubuntu
+                    IdentityFile ~/.ssh/id_rsa
+                    StrictHostKeyChecking no
+                  END
+
+            - name: Deploy on EC2
+              run: |
+                  IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/checkmate-ai-server
+                  CONTAINER_NAME=checkmate-ai
+
+                  ssh checkmate <<EOF
+                    sudo docker pull $IMAGE_NAME:latest
+                    
+                    sudo docker stop $CONTAINER_NAME || true
+                    sudo docker rm $CONTAINER_NAME || true
+
+                    sudo docker network create checkmate-net || true
+
+                    sudo docker run -d \
+                      --name $CONTAINER_NAME \
+                      --env-file /opt/app/.env \
+                      -p 8000:8000 \
+                      --network checkmate-net \
+                      $IMAGE_NAME:latest
+
+                    # 5. 불필요한 리소스 정리
+                    sudo docker image prune -af
+                    sudo docker container prune -f
+                    sudo docker network prune -f
+                  EOF
