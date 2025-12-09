@@ -61,19 +61,19 @@ jobs:
                   CONTAINER_NAME=checkmate-ai
 
                   ssh checkmate <<EOF
-                    sudo docker pull $IMAGE_NAME:latest
+                    sudo docker pull \$IMAGE_NAME:latest
                     
-                    sudo docker stop $CONTAINER_NAME || true
-                    sudo docker rm $CONTAINER_NAME || true
+                    sudo docker stop \$CONTAINER_NAME || true
+                    sudo docker rm \$CONTAINER_NAME || true
 
                     sudo docker network create checkmate-net || true
 
                     sudo docker run -d \
-                      --name $CONTAINER_NAME \
+                      --name \$CONTAINER_NAME \
                       --env-file /opt/app/.env \
                       -p 8000:8000 \
                       --network checkmate-net \
-                      $IMAGE_NAME:latest
+                      \$IMAGE_NAME:latest
 
                     sudo docker image prune -af
                     sudo docker container prune -f
