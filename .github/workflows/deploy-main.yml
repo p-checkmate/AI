@@ -61,6 +61,9 @@ jobs:
                   CONTAINER_NAME=checkmate-ai
 
                   ssh checkmate <<EOF
+                    IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/checkmate-ai-server"
+                    CONTAINER_NAME="checkmate-ai"
+                    
                     sudo docker pull \$IMAGE_NAME:latest
                     
                     sudo docker stop \$CONTAINER_NAME || true
