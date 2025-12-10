@@ -81,12 +81,4 @@ jobs:
                       -p 8000:8000 \
                       --network checkmate-net \
                       ${{ secrets.DOCKER_USERNAME }}/checkmate-ai-server:latest
-
-                    sudo docker image prune -af
-                    sudo docker container prune -f
-                    sudo docker network prune -f
                   EOF
-
-            - name: Final Runner Cleanup
-              if: always()
-              run: docker system prune -af || true
