@@ -24,9 +24,6 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# torch의 wheel 파일을 명시적으로 찾도록 지시
-RUN pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
-
 # 공간 확보: APT 캐시 및 임시 파일 정리
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
