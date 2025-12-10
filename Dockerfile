@@ -22,11 +22,15 @@ WORKDIR /app
 
 # 1.2. Python 의존성 설치
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt && rm -rf /root/.cache/pip /tmp/* /var/tmp/*
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 공간 확보: APT 캐시 및 임시 파일 정리
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # 1.3. 모델 다운로드 스크립트 복사 및 실행 (캐싱 레이어)
 COPY scripts/download_assets.py .
-RUN python download_assets.py && rm -rf /tmp/* /var/tmp/*
+RUN python download_assets.py
 
 # 1.4. 나머지 소스 코드 복사
 COPY . .
