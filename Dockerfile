@@ -21,7 +21,7 @@ ENV S3_MODEL_PREFIX=${S3_MODEL_PREFIX}
 WORKDIR /app
 
 # 1.2. Python 의존성 설치
-COPY requirements.txt .
+COPY requirement.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 공간 확보: APT 캐시 및 임시 파일 정리
