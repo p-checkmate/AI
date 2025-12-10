@@ -15,7 +15,7 @@ BUCKET_NAME = os.getenv("BUCKET_NAME")
 S3_MODEL_PREFIX = 'models/book_sbert_finetuned/'
 S3_EMBEDDING_KEY = 'embeddings/book_embeddings.npy'
 S3_ID_KEY = 'embeddings/book_ids.csv'
-LOCAL_MODEL_PATH = '/tmp/models/book_sbert_finetuned' # 모델 다운로드 위치
+LOCAL_MODEL_PATH = os.getenv("LOCAL_MODEL_PATH", "/tmp/models/book_sbert_finetuned")
 
 class AIService:
     def __init__(self):

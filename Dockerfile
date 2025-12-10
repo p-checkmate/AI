@@ -5,8 +5,6 @@ FROM python:3.10-slim AS builder
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV PORT 8000
-# 모델 다운로드 경로 (Docker Layer에 캐싱될 경로)
-ENV LOCAL_DOWNLOAD_PATH "/app/.local_cache/models/book_sbert_finetuned"
 
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
@@ -53,7 +51,7 @@ COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/pytho
 COPY --from=builder /app/app ./app
 
 # 2.4. 모델 파일 복사 (Docker Layer 캐싱 활용)
-COPY --from=builder ${LOCAL_DOWNLOAD_PATH} ${LOCAL_DOWNLOAD_PATH}
+COPY --from=builder /tmp/models/book_sbert_finetuned /tmp/models/book_sbert_finetuned
 
 # 2.5. 포트 노출
 EXPOSE 8000

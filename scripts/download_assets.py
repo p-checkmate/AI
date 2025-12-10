@@ -4,7 +4,7 @@ import boto3
 
 BUCKET_NAME = os.getenv("BUCKET_NAME")
 S3_MODEL_PREFIX = 'models/book_sbert_finetuned/'
-LOCAL_MODEL_PATH = '/tmp/models/book_sbert_finetuned'
+LOCAL_MODEL_PATH = os.getenv("LOCAL_MODEL_PATH", "/tmp/models/book_sbert_finetuned")
 
 if not all([BUCKET_NAME, S3_MODEL_PREFIX, LOCAL_MODEL_PATH]):
     print("환경 변수가 부족합니다.")
