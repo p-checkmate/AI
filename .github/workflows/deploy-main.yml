@@ -11,6 +11,16 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - name: Free runner disk space
+              run: |
+                  sudo rm -rf /usr/share/dotnet
+                  sudo rm -rf /usr/local/lib/android
+                  sudo rm -rf /opt/ghc
+                  sudo rm -rf /usr/share/swift
+                  sudo rm -rf /usr/share/rust
+                  docker system prune -af || true
+                  echo "Disk cleanup completed"
+
             - name: Checkout Source Code
               uses: actions/checkout@v4
 
@@ -77,15 +87,6 @@ jobs:
                     sudo docker network prune -f
                   EOF
 
-            - name: Clean up Runner Disk Space
+            - name: Final Runner Cleanup
               if: always()
-              run: |
-                  docker system prune -af
-
-                  sudo apt-get update && sudo apt-get clean
-                  sudo rm -rf /var/lib/apt/lists/*
-
-                  sudo rm -rf /usr/share/dotnet
-                  sudo rm -rf /usr/local/lib/android
-                  sudo rm -rf /usr/share/swift
-                  sudo rm -rf /usr/share/rust
+              run: docker system prune -af || true

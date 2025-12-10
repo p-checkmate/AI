@@ -23,7 +23,7 @@ WORKDIR /app
 # 공간 확보: APT 캐시 및 임시 파일 정리
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-    
+
 # 1.2. Python 의존성 설치
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -37,7 +37,7 @@ COPY scripts/download_assets.py .
 RUN python download_assets.py
 
 # 1.4. 나머지 소스 코드 복사
-COPY . .
+COPY app ./app
 
 
 # 2. Production Stage
@@ -50,7 +50,7 @@ WORKDIR /app
 COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 
 # 2.3. 소스 코드 및 설정 파일 복사
-COPY --from=builder /app /app
+COPY --from=builder /app/app ./app
 
 # 2.4. 모델 파일 복사 (Docker Layer 캐싱 활용)
 COPY --from=builder ${LOCAL_DOWNLOAD_PATH} ${LOCAL_DOWNLOAD_PATH}
