@@ -63,6 +63,8 @@ jobs:
                     User ubuntu
                     IdentityFile ~/.ssh/id_rsa
                     StrictHostKeyChecking no
+                    ServerAliveInterval 60 
+                    ServerAliveCountMax 15
                   END
 
             - name: Deploy on EC2
