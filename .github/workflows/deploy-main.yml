@@ -51,36 +51,3 @@ jobs:
                   IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/checkmate-ai-server
                   docker push $IMAGE_NAME:${{ env.IMAGE_TAG }}
                   docker push $IMAGE_NAME:latest
-
-            - name: Configure SSH
-              run: |
-                  mkdir -p ~/.ssh
-                  echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-                  chmod 600 ~/.ssh/id_rsa
-                  cat >>~/.ssh/config <<END
-                  Host checkmate
-                    HostName ${{ secrets.EC2_HOST }}
-                    User ubuntu
-                    IdentityFile ~/.ssh/id_rsa
-                    StrictHostKeyChecking no
-                    ServerAliveInterval 60 
-                    ServerAliveCountMax 15
-                  END
-
-            - name: Deploy on EC2
-              run: |
-                  ssh checkmate <<EOF
-                    sudo docker pull ${{ secrets.DOCKER_USERNAME }}/checkmate-ai-server:latest
-                    
-                    sudo docker stop checkmate-ai || true
-                    sudo docker rm checkmate-ai || true
-
-                    sudo docker network create checkmate-net || true
-
-                    sudo docker run -d \
-                      --name checkmate-ai \
-                      --env-file /opt/app/.env \
-                      -p 8000:8000 \
-                      --network checkmate-net \
-                      ${{ secrets.DOCKER_USERNAME }}/checkmate-ai-server:latest
-                  EOF

@@ -11,8 +11,6 @@ ARG AWS_SECRET_ACCESS_KEY
 ARG BUCKET_NAME
 ARG S3_MODEL_PREFIX="models/book_sbert_finetuned"
 
-ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 ENV BUCKET_NAME=${BUCKET_NAME}
 ENV S3_MODEL_PREFIX=${S3_MODEL_PREFIX}
 
@@ -32,7 +30,10 @@ RUN apt-get clean && \
 
 # 1.3. 모델 다운로드 스크립트 복사 및 실행 (캐싱 레이어)
 COPY scripts/download_assets.py .
-RUN python download_assets.py
+
+RUN AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+    AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+    python download_assets.py
 
 # 1.4. 나머지 소스 코드 복사
 COPY app ./app
